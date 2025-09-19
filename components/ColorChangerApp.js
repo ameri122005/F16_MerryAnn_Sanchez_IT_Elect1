@@ -1,26 +1,41 @@
-import React, { useState } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+// ColorChangerApp.js
+import React, { useState } from "react";
+import { View, Text, Button, StyleSheet, SafeAreaView } from "react-native";
 
 export default function ColorChangerApp() {
-  const [bgColor, setBgColor] = useState('white');
+  const [bg, setBg] = useState("#ffffff"); // default white
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={styles.row}>
-        <View style={styles.spacerRight}>
-          <Button title="White" onPress={() => setBgColor('white')} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
+      <View style={[styles.container, { backgroundColor: bg }]}>
+        <Text style={styles.title}>Color Changer App</Text>
+        <View style={styles.buttonContainer}>
+          <Button title="White" onPress={() => setBg("#ffffff")} />
         </View>
-        <View style={styles.spacerRight}>
-          <Button title="Light Blue" onPress={() => setBgColor('lightblue')} />
+        <View style={styles.buttonContainer}>
+          <Button title="Light Blue" onPress={() => setBg("#ADD8E6")} />
         </View>
-        <Button title="Light Green" onPress={() => setBgColor('lightgreen')} />
+        <View style={styles.buttonContainer}>
+          <Button title="Light Green" onPress={() => setBg("#90EE90")} />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { height: 300, justifyContent: 'center', alignItems: 'center' },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  spacerRight: { marginRight: 10 },
+  container: { 
+    flex: 1, 
+    alignItems: "center", 
+    justifyContent: "center"
+  },
+  title: { 
+    fontSize: 28, 
+    fontWeight: "bold", 
+    marginBottom: 20 
+  },
+  buttonContainer: { 
+    marginVertical: 8, 
+    width: 200 
+  }
 });
