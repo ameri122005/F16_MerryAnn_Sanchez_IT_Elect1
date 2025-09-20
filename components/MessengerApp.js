@@ -1,3 +1,4 @@
+// src/components/MessengerApp.js
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -10,11 +11,11 @@ import {
   Platform,
 } from "react-native";
 
-
 export default function MessengerApp() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
+  // Add a new message to the list
   const sendMessenger = () => {
     if (message.trim() === "") return;
     const newMessage = { id: Date.now().toString(), text: message };
@@ -27,9 +28,11 @@ export default function MessengerApp() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      {/* Card that stays fixed height */}
       <View style={styles.card}>
         <Text style={styles.title}>Messenger</Text>
 
+        {/* Scrollable message list */}
         <FlatList
           data={messages}
           keyExtractor={(item) => item.id}
@@ -38,9 +41,10 @@ export default function MessengerApp() {
               <Text style={styles.messageText}>{item.text}</Text>
             </View>
           )}
-          style={{ maxHeight: 150 }}
+          style={styles.messageList}       // 👈 keeps list inside fixed area
         />
 
+        {/* Input + Send button */}
         <View style={styles.messengerBar}>
           <TextInput
             style={styles.messengerInput}
@@ -48,7 +52,10 @@ export default function MessengerApp() {
             onChangeText={setMessage}
             placeholder="Type your message..."
           />
-          <TouchableOpacity style={styles.messengerButton} onPress={sendMessenger}>
+          <TouchableOpacity
+            style={styles.messengerButton}
+            onPress={sendMessenger}
+          >
             <Text style={styles.messengerButtonText}>SEND</Text>
           </TouchableOpacity>
         </View>
@@ -57,20 +64,53 @@ export default function MessengerApp() {
   );
 }
 
+// 🎨 Styles
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "skyblue", padding: 30 },
+  container: {
+    flex: 1,
+    backgroundColor: "skyblue",
+    padding: 30,
+    justifyContent: "center",
+  },
   card: {
     backgroundColor: "pink",
     padding: 15,
     borderRadius: 8,
-    marginBottom: 15,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+
+    // 🔒 FIXED HEIGHT so card never stretches
+    height: 300,
   },
-  title: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  messengerBar: { flexDirection: "row", alignItems: "center", marginTop: 60 },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  // The scrolling area inside the card
+  messageList: {
+    flexGrow: 0,
+    maxHeight: 150,
+    marginBottom: 10,
+  },
+  messageBubble: {
+    backgroundColor: "#e4e6eb",
+    padding: 8,
+    borderRadius: 6,
+    marginBottom: 5,
+    alignSelf: "flex-start",
+  },
+  messageText: {
+    fontSize: 14,
+    color: "#000",
+  },
+  messengerBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: "auto", // sticks to bottom of card
+  },
   messengerInput: {
     flex: 1,
     fontSize: 16,
@@ -88,13 +128,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginLeft: 8,
   },
-  messengerButtonText: { color: "white", fontWeight: "bold" },
-  messageBubble: {
-    backgroundColor: "#e4e6eb",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 5,
-    alignSelf: "flex-start",
+  messengerButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
-  messageText: { fontSize: 14, color: "#000" },
 });
+
+
