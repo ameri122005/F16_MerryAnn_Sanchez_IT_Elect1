@@ -1,4 +1,4 @@
-// src/components/NewsFeedApp.js
+
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "pink",
-    padding: 15,
+    padding: 12,
     borderRadius: 8,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -87,10 +87,10 @@ const styles = StyleSheet.create({
   },
   articleArea: {
     maxHeight: 140, // scroll only the article text
-    marginBottom: 10,
+    marginBottom: 5,
   },
   title: { fontSize: 18, fontWeight: "bold", marginBottom: 6 },
-  subtitle: { fontSize: 16, fontWeight: "600", marginBottom: 5 },
+  subtitle: { fontSize: 16, fontWeight: "600", marginBottom: 9},
   content: { fontSize: 14, color: "#333" },
 
   commentList: {

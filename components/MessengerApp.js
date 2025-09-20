@@ -1,4 +1,4 @@
-// src/components/MessengerApp.js
+
 import React, { useState } from "react";
 import {
   StyleSheet,
