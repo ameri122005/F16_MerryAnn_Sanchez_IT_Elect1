@@ -1,0 +1,15 @@
+import React from "react";
+import { ScrollView } from "react-native";
+import MessengerApp from "./components/MessengerApp";
+import NewsfeedApp from "./components/NewsfeedApp";
+
+export default function App() {
+
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: "skyblue", padding: 30 }}>
+      <MessengerApp />
+      <NewsfeedApp />
+    </ScrollView>
+  );
+}

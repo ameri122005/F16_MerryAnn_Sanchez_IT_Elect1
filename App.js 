@@ -1,0 +1,14 @@
+import React from "react";
+import { View } from "react-native";
+import MessengerApp from "./components/MessengerApp";
+ import NewsFeedApp from "./components/NewsFeedApp";
+
+export default function App() {
+  return (
+    <View style={{ flex: 1, backgroundColor: "skyblue", padding: 30 }}>
+      <MessengerApp />
+       <NewsFeedApp /> 
+    </View>
+  );
+}
+
