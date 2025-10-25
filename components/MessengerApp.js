@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,129 +8,240 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  SafeAreaView,
+  Image,
 } from "react-native";
 
-export default function MessengerApp() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+import Ann from "../assets/Ann.jpg";
 
-  // Add a new message to the list
-  const sendMessenger = () => {
-    if (message.trim() === "") return;
-    const newMessage = { id: Date.now().toString(), text: message };
+export default function MessengerNewsFeed() {
+  const [messageText, setMessageText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const listRef = useRef(null);
+
+  const sendMessage = () => {
+    const trimmed = messageText.trim();
+    if (!trimmed) return;
+
+    const sender = messages.length % 2 === 0 ? "me" : "friend";
+
+    const newMessage = {
+      id: Date.now().toString(),
+      text: trimmed,
+      sender,
+    };
+
     setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
+    setMessageText("");
+
+    setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: true });
+    }, 50);
+  };
+
+  const renderItem = ({ item }) => {
+    const isMe = item.sender === "me";
+    return (
+      <View
+        style={[
+          styles.messageRow,
+          isMe ? styles.rowRight : styles.rowLeft,
+        ]}
+      >
+        {!isMe && (
+          <View style={styles.friendAvatar}>
+            <Text style={styles.friendInitials}>F</Text>
+          </View>
+        )}
+
+        <View
+          style={[
+            styles.messageBubble,
+            isMe ? styles.bubbleMe : styles.bubbleFriend,
+          ]}
+        >
+          <Text style={[styles.messageText, isMe ? styles.textMe : styles.textFriend]}>
+            {item.text}
+          </Text>
+        </View>
+
+        {isMe && <Image source={Ann} style={styles.myAvatar} />}
+      </View>
+    );
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      {/* Card that stays fixed height */}
-      <View style={styles.card}>
-        <Text style={styles.title}>Messenger</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.inner}>
+            {/* Pink Card */}
+            <View style={styles.card}>
+              <Text style={styles.title}>Messenger</Text>
+              <Text style={styles.subtitle}>Chat (auto-alternate sender)</Text>
 
-        {/* Scrollable message list */}
-        <FlatList
-          data={messages}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.messageBubble}>
-              <Text style={styles.messageText}>{item.text}</Text>
+              {/* Messages FlatList */}
+              <FlatList
+                data={messages}
+                keyExtractor={(item) => item.id}
+                renderItem={renderItem}
+                ref={listRef}
+                contentContainerStyle={{ paddingVertical: 6 }}
+                onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+                keyboardShouldPersistTaps="handled"
+                style={{ flexGrow: 1 }}
+              />
+
+              {/* Input bar pinned to bottom */}
+              <View style={[styles.inputBar, { marginTop: "auto" }]}>
+                <TextInput
+                  style={styles.input}
+                  value={messageText}
+                  onChangeText={setMessageText}
+                  placeholder="Type a message..."
+                  placeholderTextColor="#666"
+                  returnKeyType="send"
+                  onSubmitEditing={sendMessage}
+                />
+                <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+                  <Text style={styles.sendButtonText}>SEND</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          )}
-          style={styles.messageList}       // 👈 keeps list inside fixed area
-        />
-
-        {/* Input + Send button */}
-        <View style={styles.messengerBar}>
-          <TextInput
-            style={styles.messengerInput}
-            value={message}
-            onChangeText={setMessage}
-            placeholder="Type your message..."
-          />
-          <TouchableOpacity
-            style={styles.messengerButton}
-            onPress={sendMessenger}
-          >
-            <Text style={styles.messengerButtonText}>SEND</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-// 🎨 Styles
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "skyblue",
-    padding: 30,
-    justifyContent: "center",
+  },
+  inner: {
+    flex: 1,
+    padding: 20,
   },
   card: {
     backgroundColor: "pink",
-    padding: 15,
-    borderRadius: 8,
+    borderRadius: 15,
+    padding: 12,
+    width: "100%",
+    maxWidth: 380,
+    flex: 1, // fill remaining space
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-
-    // 🔒 FIXED HEIGHT so card never stretches
-    height: 300,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 6,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 2,
   },
-  // The scrolling area inside the card
-  messageList: {
-    flexGrow: 0,
-    maxHeight: 150,
-    marginBottom: 10,
+  subtitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 12,
+    color: "#333",
+  },
+  messagesList: {
+    paddingVertical: 6,
+  },
+  messageRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginBottom: 8,
+    maxWidth: "100%",
+  },
+  rowLeft: {
+    justifyContent: "flex-start",
+  },
+  rowRight: {
+    justifyContent: "flex-end",
+  },
+  friendAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#bbb",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  friendInitials: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  myAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: "#fff",
   },
   messageBubble: {
-    backgroundColor: "#e4e6eb",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 5,
-    alignSelf: "flex-start",
+    maxWidth: "75%",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  bubbleFriend: {
+    backgroundColor: "#fff",
+    borderColor: "#eee",
+    borderTopLeftRadius: 4,
+  },
+  bubbleMe: {
+    backgroundColor: "#007bff",
+    borderColor: "#0077ff",
+    borderTopRightRadius: 4,
   },
   messageText: {
     fontSize: 14,
-    color: "#000",
   },
-  messengerBar: {
+  textFriend: {
+    color: "#111",
+  },
+  textMe: {
+    color: "#fff",
+  },
+  inputBar: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "auto", // sticks to bottom of card
+    paddingTop: 8,
   },
-  messengerInput: {
+  input: {
     flex: 1,
-    fontSize: 16,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === "ios" ? 12 : 8,
+    fontSize: 15,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: "#f9f9f9",
+    borderColor: "#ddd",
   },
-  messengerButton: {
-    backgroundColor: "#007bff",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 6,
+  sendButton: {
     marginLeft: 8,
+    backgroundColor: "green",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
-  messengerButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  sendButtonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
-
-

@@ -1,15 +1,25 @@
-import React from "react";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import NewsFeedApp from './components/NewsFeedApp';
+import MessengerApp from './components/MessengerApp';
 
-
-import { View } from "react-native";
-import MessengerApp from "./components/MessengerApp";
- import NewsFeedApp from "./components/NewsFeedApp";
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <View style={{ flex: 1, backgroundColor: "skyblue", padding: 30 }}>
-      <MessengerApp />
-       <NewsFeedApp /> 
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="NewsFeed">
+        <Stack.Screen
+          name="NewsFeed"
+          component={NewsFeedApp}
+          options={{ title: 'News Feed' }}
+        />
+        <Stack.Screen
+          name="Messenger"
+          component={MessengerApp}
+          options={{ title: 'Messenger' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
